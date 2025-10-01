@@ -2,21 +2,43 @@ const canvas = document.getElementById('tetris')
 
 const ctx = canvas.getContext('2d')
 
-const starterOffsetY = 2
-
 const boardConfig = {
   height: 20,
   width:10,
   shape: 1,
   shapeSize: 30,
   offsetX: 4,
-  offsetY: 2
+  offsetY: 2,
+  starterOffsetY: 2
 }
 
 canvas.height = boardConfig.height * boardConfig.shapeSize
 canvas.width = boardConfig.width * boardConfig.shapeSize
 
-const board = Array.from({length: boardConfig.height}, () => Array(boardConfig.width).fill(0))
+// const board = Array.from({length: boardConfig.height}, () => Array(boardConfig.width).fill(0))
+
+const board = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 0, 0, 1, 1, 1]
+]
 
 const shape = [
   [
@@ -70,13 +92,19 @@ function selectRandomShape() {
 }
 
 function draw() {
-  console.log(randomShape)
-  shape[randomShape].forEach((row, y) => {
+  if(!brickState.alive) {
+    selectRandomShape()
+  }
+
+  console.log("randomShape", randomShape)
+  shape[4].forEach((row, y) => {
     row.forEach((value, x) => {
       if(value === 1) {
         board[boardConfig.offsetY + y][boardConfig.offsetX + x] = value
       }
-      board[boardConfig.offsetY + y - 1][boardConfig.offsetX + x - 1] = 0
+      if((boardConfig.offsetY + y - 1) === 0 ) {
+        board[boardConfig.offsetY + y - 1][boardConfig.offsetX + x] = 0
+      }
     })
   })
 
@@ -85,13 +113,13 @@ function draw() {
       if(value === 1) {
         ctx.clearRect(0,0, canvas.width, canvas.height)
         ctx.fillStyle = "yellow"
-        ctx.fillRect((boardConfig.offsetX) * boardConfig.shapeSize, (boardConfig.offsetY) * boardConfig.shapeSize, boardConfig.shapeSize, boardConfig.shapeSize)
+        ctx.fillRect(x * boardConfig.shapeSize, y * boardConfig.shapeSize, boardConfig.shapeSize, boardConfig.shapeSize)
       }
     })
   })
-}
 
-console.log(board)
+  console.log(board)
+}
 
 function solidifyShape(y, x){
   board[y][x] = 1
@@ -115,8 +143,7 @@ function busEvent() {
 function dropShape() {
   setInterval(() => {
     if(boardConfig.offsetY >= board.length - 1) {
-      boardConfig.offsetY = starterOffsetY
-      selectRandomShape()
+      boardConfig.offsetY = boardConfig.starterOffsetY
       brickState.alive = false
     } else {
       brickState.alive = true
