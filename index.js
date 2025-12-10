@@ -82,7 +82,8 @@ const brickState = {
 
 const userConfig = {
   moveSpeed: 10,
-  timeBrickDown: 500
+  clock: 0,
+  timeBrickDown: 30
 }
 
 let randomShape;
@@ -93,36 +94,70 @@ function selectRandomShape() {
 
 function draw() {
   if(!brickState.alive) {
+    boardConfig.offsetX = 4
+    boardConfig.offsetY = 2
+    userConfig.clock = 0
+
+    console.log("shape", shape[randomShape])
     selectRandomShape()
-  }
 
-  console.log("randomShape", randomShape)
-  shape[4].forEach((row, y) => {
-    row.forEach((value, x) => {
-      if(value === 1) {
-        board[boardConfig.offsetY + y][boardConfig.offsetX + x] = value
-      }
-      if((boardConfig.offsetY + y - 1) === 0 ) {
-        board[boardConfig.offsetY + y - 1][boardConfig.offsetX + x] = 0
-      }
+    shape[randomShape].forEach((row, y) => {
+      row.forEach((value, x) => {
+        if( value === 1) {
+          ctx.fillStyle = "red"
+          ctx.fillRect((boardConfig.offsetX + x) * boardConfig.shapeSize, (boardConfig.offsetY + y) * boardConfig.shapeSize, boardConfig.shapeSize, boardConfig.shapeSize)
+        }
+      })
     })
-  })
 
+    brickState.alive = true
+  } else if (brickState.alive) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    dropShape()
+  }
+  
   board.forEach((row, y) => {
     row.forEach((value, x) => {
       if(value === 1) {
-        ctx.clearRect(0,0, canvas.width, canvas.height)
         ctx.fillStyle = "yellow"
         ctx.fillRect(x * boardConfig.shapeSize, y * boardConfig.shapeSize, boardConfig.shapeSize, boardConfig.shapeSize)
       }
     })
   })
 
-  console.log(board)
+  // console.log(board)
 }
 
 function solidifyShape(y, x){
   board[y][x] = 1
+}
+
+function dropShape() {
+  userConfig.clock++
+
+  if(userConfig.clock >= userConfig.timeBrickDown) {
+    boardConfig.offsetY++
+    userConfig.clock = 0
+  }
+
+  if (true) {
+    shape[randomShape].forEach((row, y) => {
+      row.forEach((value, x) => {
+        if( value === 1) {
+          ctx.fillStyle = "red"
+          ctx.fillRect((boardConfig.offsetX + x) * boardConfig.shapeSize, (boardConfig.offsetY + y) * boardConfig.shapeSize, boardConfig.shapeSize, boardConfig.shapeSize)
+        }
+      })
+    })
+  } else {
+    solidifyShape(boardConfig.offsetY, boardConfig.offsetX)
+    brickState.alive = false
+  }
+}
+
+function update() {
+  draw()
+  requestAnimationFrame(update)
 }
 
 function busEvent() {
@@ -138,24 +173,6 @@ function busEvent() {
       console.log('ArrowDown', boardConfig.offsetY) 
     }
   })
-}
-
-function dropShape() {
-  setInterval(() => {
-    if(boardConfig.offsetY >= board.length - 1) {
-      boardConfig.offsetY = boardConfig.starterOffsetY
-      brickState.alive = false
-    } else {
-      brickState.alive = true
-      boardConfig.offsetY++
-    }
-    console.log("setInterval", boardConfig.offsetY)
-  }, 500)
-}
-
-function update() {
-  draw()
-  requestAnimationFrame(update)
 }
 
 function main(){
