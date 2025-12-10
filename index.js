@@ -150,7 +150,6 @@ function dropShape() {
       })
     })
   } else {
-    // comentario prueba
     solidifyShape(boardConfig.offsetY, boardConfig.offsetX)
     brickState.alive = false
   }
