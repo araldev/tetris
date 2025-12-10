@@ -129,7 +129,9 @@ function draw() {
 }
 
 function solidifyShape(y, x){
-  board[y][x] = 1
+  if(y < board.length) {
+    board[y][x] = 1
+  }
 }
 
 function dropShape() {
@@ -140,7 +142,7 @@ function dropShape() {
     userConfig.clock = 0
   }
 
-  if (true) {
+  if (boardConfig.offsetY + shape[randomShape].length - 1 < board.length) {
     shape[randomShape].forEach((row, y) => {
       row.forEach((value, x) => {
         if( value === 1) {
@@ -150,7 +152,11 @@ function dropShape() {
       })
     })
   } else {
-    solidifyShape(boardConfig.offsetY, boardConfig.offsetX)
+    shape[randomShape].forEach((row, y) => {
+      row.forEach((value, x) => {
+        solidifyShape(boardConfig.offsetY + y, boardConfig.offsetX + x)
+      })
+    })
     brickState.alive = false
   }
 }
@@ -163,13 +169,13 @@ function update() {
 function busEvent() {
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') {
-      boardConfig.offsetX = --boardConfig.offsetX
+      boardConfig.offsetX--
       console.log('ArrowLeft', boardConfig.offsetX)
     } else if (e.key === 'ArrowRight') {
-      boardConfig.offsetX = ++boardConfig.offsetX
+      boardConfig.offsetX++
       console.log('ArrowRight', boardConfig.offsetX)
     } else if (e.key === 'ArrowDown') {
-      boardConfig.offsetY = ++boardConfig.offsetY
+      boardConfig.offsetY++
       console.log('ArrowDown', boardConfig.offsetY) 
     }
   })
