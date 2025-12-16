@@ -99,6 +99,7 @@ function draw() {
     userConfig.clock = 0
 
     console.log("shape", shape[randomShape])
+    console.log("board", board)
     selectRandomShape()
 
     shape[randomShape].forEach((row, y) => {
@@ -124,25 +125,39 @@ function draw() {
       }
     })
   })
+}
 
-  // console.log(board)
+function checkColision() {
+  let currentY = boardConfig.offsetY + shape[randomShape].length - 1
+  let colisioned = false
+
+  shape[randomShape][shape[randomShape].length -1].forEach((value, x) => {
+    if(currentY >= board.length || value && board[currentY][boardConfig.offsetX + x]) {
+      colisioned = true
+      return
+    } else {
+      colisioned = false
+      return
+    }
+  })
+
+  return colisioned
 }
 
 function solidifyShape(y, x){
-  if(y < board.length) {
     board[y][x] = 1
-  }
 }
 
 function dropShape() {
   userConfig.clock++
+  console.log(checkColision())
 
   if(userConfig.clock >= userConfig.timeBrickDown) {
     boardConfig.offsetY++
     userConfig.clock = 0
   }
 
-  if (boardConfig.offsetY + shape[randomShape].length - 1 < board.length) {
+  if (!checkColision()) {
     shape[randomShape].forEach((row, y) => {
       row.forEach((value, x) => {
         if( value === 1) {
@@ -151,10 +166,13 @@ function dropShape() {
         }
       })
     })
-  } else {
+  } else if(checkColision()) {
+    console.log("colisioned")
     shape[randomShape].forEach((row, y) => {
       row.forEach((value, x) => {
-        solidifyShape(boardConfig.offsetY + y, boardConfig.offsetX + x)
+        if(value === 1) {
+          solidifyShape(boardConfig.offsetY + y -1, boardConfig.offsetX + x)
+        }
       })
     })
     brickState.alive = false
